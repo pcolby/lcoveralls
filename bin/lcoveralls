@@ -73,13 +73,13 @@ def get_source_files(info_files, root_dir)
       end
 
       # DA:<line number>,<execution count>[,<checksum>]
-      line.match(/DA:(\d+),(\d+)(?:,(.*))?$/) do |match|
-        line_index = match[1].to_i - 1
+      line.match(/DA:(?<line>\d+),(?<count>\d+)(,(?<checksum>.*))?$/) do |match|
+        line_index = match[:line].to_i - 1
         if !sources[source_pathname][:coverage][line_index] then
           sources[source_pathname][:coverage][line_index] = 0
         end
         sources[source_pathname][:coverage][line_index] = 
-          sources[source_pathname][:coverage][line_index] + match[2].to_i;
+          sources[source_pathname][:coverage][line_index] + match[:count].to_i;
       end
 
       # end_of_record
