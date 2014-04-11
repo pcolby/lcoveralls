@@ -106,8 +106,8 @@ def get_git_info(root_dir)
 
     info[:remotes] = []
     `git remote --verbose`.each_line do |line|
-      line.match(/^(\S+)\s+(\S+)(?:\s+\((fetch|push)\))?/) do |match|
-        info[:remotes] << { :name => match[1], :url =>  match[2] }
+      line.match(/^(?<name>\S+)\s+(?<url>\S+)(\s+\((fetch|push)\))?/) do |match|
+        info[:remotes] << Hash[match.names.zip(match.captures)]
       end
     end
     info[:remotes].uniq!
