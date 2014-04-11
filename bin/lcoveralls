@@ -32,7 +32,7 @@ def find_root(info_files)
   root_dirs = Hash.new(0)
   info_files.each do |file|
     File.open(file).each do |line|
-      line.match(/SF:(.*)/) do |match|
+      line.match(/^SF:(.*)$/) do |match|
         Dir.chdir(File.dirname(match[1])) do
           root_dir = `git rev-parse --show-toplevel`.rstrip
           root_dirs[root_dir] = root_dirs[root_dir] + 1 unless root_dir.empty?
@@ -53,7 +53,35 @@ def find_root(info_files)
 end
 
 def get_source_files(info_files, root_dir)
-  '@todo'
+  sources = {}
+  info_files.each do |file|
+    source_pathname = nil
+    in_record = false
+    File.open(file).each do |line|
+      # SF:<absolute path to the source file>
+      # DA:<line number>,<execution count>[,<checksum>]
+      # end_of_record
+      #line.match(/^SF:(.*)$/) do |match|
+      #  warn 'Warning: Found source filename without preceding end_of_record' if in_record
+      #  source_pathname = match[1]
+      #  if (source_pathname.start_with?(root_dir)) then
+      #    sources[source_pathname] = {} unless sources.has_key?(source_pathname)
+      #    sources[source_pathname][:name] = source_pathname.sub(root_dir+'/', '')
+      #  end
+      #end
+
+      line.match('^SF:' + Regexp.quote(root_dir) + '/(.*)$') do |match|
+        warn 'Warning: Found source filename without preceding end_of_record' if in_record
+        source_pathname = match[1]
+        sources[source_pathname] = {} unless sources.has_key?(source_pathname)
+        sources[source_pathname][:name] = source_pathname
+      end
+
+      in_record = false if line == "end_of_record\n"
+    end
+  end
+
+  sources.values
 end
 
 def get_git_info(root_dir)
