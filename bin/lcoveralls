@@ -59,24 +59,30 @@ def get_source_files(info_files, root_dir)
     in_record = false
     File.open(file).each do |line|
       # SF:<absolute path to the source file>
-      # DA:<line number>,<execution count>[,<checksum>]
-      # end_of_record
-      #line.match(/^SF:(.*)$/) do |match|
-      #  warn 'Warning: Found source filename without preceding end_of_record' if in_record
-      #  source_pathname = match[1]
-      #  if (source_pathname.start_with?(root_dir)) then
-      #    sources[source_pathname] = {} unless sources.has_key?(source_pathname)
-      #    sources[source_pathname][:name] = source_pathname.sub(root_dir+'/', '')
-      #  end
-      #end
-
       line.match('^SF:' + Regexp.quote(root_dir) + '/(.*)$') do |match|
         warn 'Warning: Found source filename without preceding end_of_record' if in_record
         source_pathname = match[1]
-        sources[source_pathname] = {} unless sources.has_key?(source_pathname)
-        sources[source_pathname][:name] = source_pathname
+        if !sources.has_key?(source_pathname) then
+          source = File.read(match[1])
+          sources[source_pathname] = {
+            :name => source_pathname,
+            :source => source,
+            :coverage => Array.new(source.lines.count)
+          }
+        end
       end
 
+      # DA:<line number>,<execution count>[,<checksum>]
+      line.match(/DA:(\d+),(\d+)(?:,(.*))?$/) do |match|
+        line_index = match[1].to_i - 1
+        if !sources[source_pathname][:coverage][line_index] then
+          sources[source_pathname][:coverage][line_index] = 0
+        end
+        sources[source_pathname][:coverage][line_index] = 
+          sources[source_pathname][:coverage][line_index] + match[2].to_i;
+      end
+
+      # end_of_record
       in_record = false if line == "end_of_record\n"
     end
   end
@@ -101,7 +107,7 @@ def get_git_info(root_dir)
     info[:remotes] = []
     `git remote --verbose`.each_line do |line|
       line.match(/^(\S+)\s+(\S+)(?:\s+\((fetch|push)\))?/) do |match|
-        info[:remotes] << { 'name' => match[1], 'url' =>  match[2] }
+        info[:remotes] << { :name => match[1], :url =>  match[2] }
       end
     end
     info[:remotes].uniq!
