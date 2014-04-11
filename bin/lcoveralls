@@ -1,0 +1,69 @@
+#!/usr/bin/ruby -w
+
+# Copyright 2014 Paul Colby
+
+require 'find'
+require 'optparse'
+
+# @todo Set this via rake?
+VERSION = '0.0.1'
+
+options = {}
+
+opts = OptionParser.new do |o|
+  o.banner = "Usage: #{o.program_name} [options] [tracefile(s)]"
+  o.on('-h', '--help',        'Print usage text, then exit')     { puts o; exit }
+  o.on('-r', '--root PATH',   'Set the path to the repo root.')  { |path|  options[:root]  = path  }
+  o.on('-t', '--token TOKEN', 'Set coveralls repo token')        { |token| options[:token] = token }
+  o.on('-v', '--version',     'Print version number, then exit') { puts VERSION; exit }
+end
+
+begin
+opts.parse!
+rescue OptionParser::InvalidOption => e
+  $stderr.puts opts
+  $stderr.puts e
+  exit 1
+end
+
+def find_root(info_files)
+  # Try source file(s) covered by the lcov tracefile(s).
+  root_dirs = Hash.new(0)
+  info_files.each do |file|
+    File.open(file).each do |line|
+      line.match(/SF:(.*)/) do |match|
+        Dir.chdir(File.dirname(match[1])) do
+          root_dir = `git rev-parse --show-toplevel`.rstrip
+          root_dirs[root_dir] = root_dirs[root_dir] + 1 unless root_dir.empty?
+        end if Dir.exist?(File.dirname(match[1]))
+      end
+    end
+  end
+
+  if root_dirs.empty?
+    nil
+  elsif root_dirs.size == 1
+    root_dirs.shift[0]
+  else
+    root_dir = root_dirs.max_by { |key, value| value }[0]
+    warn "Warning: Found multiple possible repo roots. Settled on #{root_dir}"
+    root_dir
+  end
+end
+
+begin
+
+  # Find *.info tracefiles if none specified on the command line.
+  Find.find('.') do |path|
+    ARGV << path if path =~ /.*\.info$/
+  end unless ARGV.any?
+
+  options[:root] = find_root(ARGV) unless options.include?(:root)
+  abort 'Error: No root specified, and none could be detected.' unless options[:root]
+
+  puts options
+  puts ARGV
+
+  # info
+  
+end
