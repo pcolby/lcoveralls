@@ -3,6 +3,7 @@
 # Copyright 2014 Paul Colby
 
 require 'find'
+require 'json'
 require 'optparse'
 
 # @todo Set this via rake?
@@ -51,6 +52,37 @@ def find_root(info_files)
   end
 end
 
+def get_source_files(info_files, root_dir)
+  '@todo'
+end
+
+def get_git_info(root_dir)
+  Dir.chdir(root_dir) do
+    info = {}
+
+    info[:head] = {}
+    info[:head][:id] = `git show --format='%H' --no-patch`.rstrip
+    info[:head][:author_name] = `git show --format='%an' --no-patch`.rstrip
+    info[:head][:author_email] = `git show --format='%ae' --no-patch`.rstrip
+    info[:head][:commiter_name] = `git show --format='%cn' --no-patch`.rstrip
+    info[:head][:commiter_email] = `git show --format='%ce' --no-patch`.rstrip
+    info[:head][:message] = `git show --format='%B' --no-patch`.rstrip
+
+    info[:branch] = `git rev-parse --abbrev-ref HEAD`.rstrip
+
+    info[:remotes] = []
+    `git remote --verbose`.each_line do |line|
+      line.match(/^(\S+)\s+(\S+)(?:\s+\((fetch|push)\))?/) do |match|
+        info[:remotes] << { 'name' => match[1], 'url' =>  match[2] }
+      end
+    end
+    info[:remotes].uniq!
+    info.delete(:remotes) if info[:remotes].empty?
+
+    info
+  end if Dir.exist?(root_dir)
+end
+
 begin
 
   # Find *.info tracefiles if none specified on the command line.
@@ -61,9 +93,16 @@ begin
   options[:root] = find_root(ARGV) unless options.include?(:root)
   abort 'Error: No root specified, and none could be detected.' unless options[:root]
 
+  job = {}
+  job[:repo_token] = '@todo'
+  job[:service_name] = '@todo'   # 'travis'
+  job[:service_job_id] = '@todo' # TRAVIS_JOB_NUMBER
+
+  job[:source_files] = get_source_files(ARGV, options[:root])
+  job[:git] = get_git_info(options[:root])
+  job[:run_at] = Time.new
+
   puts options
   puts ARGV
-
-  # info
-  
+  puts JSON::pretty_generate job
 end
