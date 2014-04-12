@@ -10,28 +10,32 @@ require 'optparse'
 # @todo Set this via rake?
 VERSION = '0.0.1'
 
-options = { :verbosity => 1 }
-opts = OptionParser.new do |o|
-  o.banner = "Usage: #{o.program_name} [options] [tracefile(s)]"
-  o.on(      '--dryrun',      'Do not actually submit to coverall.io' ) { options[:dryrun] = true }
-  o.on('-h', '--help',        'Print usage text, then exit')     { puts o; exit }
-  o.on('-r', '--root PATH',   'Set the path to the repo root')   { |path|  options[:root]  = path  }
-  o.on('-s', '--service NAME','Set coveralls service name')      { |name|  options[:service] = name }
-  o.on('-t', '--token TOKEN', 'Set coveralls repo token')        { |token| options[:token] = token }
-  o.on(      '--version',     'Print version number, then exit') { puts VERSION; exit }
+class Lcoveralls
 
-  o.on(      '--silent',      'Disable all standard output') { options[:verbosity] = 0 }
-  o.on('-q', '--quiet',       'Show less standard output')   { options[:verbosity] = options[:verbosity] - 1 }
-  o.on('-v', '--quiet',       'Show more standard output')   { options[:verbosity] = options[:verbosity] + 1 }
-  o.on(      '--trace',       'Show as much output as possible') { options[:verbosity] = 1000 }
-end
+def parse_options
+    @options = { :verbosity => 1 }
+  opts = OptionParser.new do |o|
+    o.banner = "Usage: #{o.program_name} [options] [tracefile(s)]"
+    o.on(      '--dryrun',      'Do not actually submit to coverall.io' ) { @options[:dryrun] = true }
+    o.on('-h', '--help',        'Print usage text, then exit')     { puts o; exit }
+    o.on('-r', '--root PATH',   'Set the path to the repo root')   { |path|  @options[:root]  = path  }
+    o.on('-s', '--service NAME','Set coveralls service name')      { |name|  @options[:service] = name }
+    o.on('-t', '--token TOKEN', 'Set coveralls repo token')        { |token| @options[:token] = token }
+    o.on(      '--version',     'Print version number, then exit') { puts VERSION; exit }
 
-begin
-opts.parse!
-rescue OptionParser::InvalidOption => e
-  $stderr.puts opts
-  $stderr.puts e
-  exit 1
+    o.on(      '--silent',      'Disable all standard output') { @options[:verbosity] = 0 }
+    o.on('-q', '--quiet',       'Show less standard output')   { @options[:verbosity] = @options[:verbosity] - 1 }
+    o.on('-v', '--quiet',       'Show more standard output')   { @options[:verbosity] = @options[:verbosity] + 1 }
+    o.on(      '--trace',       'Show as much output as possible') { @options[:verbosity] = 1000 }
+  end
+
+  begin
+    opts.parse!
+  rescue OptionParser::InvalidOption => e
+    $stderr.puts opts
+    $stderr.puts e
+    exit 1
+  end
 end
 
 def find_root(info_files)
@@ -140,29 +144,29 @@ def boundary_chr(index)
   end
 end
 
-begin
+def run
   # Find *.info tracefiles if none specified on the command line.
   Find.find('.') do |path|
-    puts "Looking for tracefiles: #{path}" if options[:verbosity] > 2
+    puts "Looking for tracefiles: #{path}" if @options[:verbosity] > 2
     if path =~ /.*\.info$/ then
-      puts "Found tracefile: #{path}" if options[:verbosity] > 1
+      puts "Found tracefile: #{path}" if @options[:verbosity] > 1
       ARGV << path
     end
   end unless ARGV.any?
 
-  options[:root] = find_root(ARGV) unless options.include?(:root)
-  abort 'Error: No root specified, and none could be detected.' unless options[:root]
+  @options[:root] = find_root(ARGV) unless @options.include?(:root)
+  abort 'Error: No root specified, and none could be detected.' unless @options[:root]
 
   job = {}
-  job[:repo_token] = options[:token]
+  job[:repo_token] = @options[:token]
   job[:service_name] = 'lcoveralls' # @todo Use CLI and/or ENV.
   #job[:service_job_id] = '1' # TRAVIS_JOB_NUMBER
 
-  job[:source_files] = get_source_files(ARGV, options[:root])
-  job[:git] = get_git_info(options[:root])
+  job[:source_files] = get_source_files(ARGV, @options[:root])
+  job[:git] = get_git_info(@options[:root])
   job[:run_at] = Time.new
 
-  if options[:verbosity] > 2 then
+  if @options[:verbosity] > 2 then
     puts JSON::pretty_generate job
   end
 
@@ -171,17 +175,25 @@ begin
   http.use_ssl = true
   http.verify_mode = OpenSSL::SSL::VERIFY_PEER
 
-  BOUNDARY = (1...70).map { boundary_chr(rand(62)) }.join
+  @BOUNDARY = (1...70).map { boundary_chr(rand(62)) }.join
   req = Net::HTTP::Post.new(uri.path)
-  req.content_type = "multipart/form-data, boundary=#{BOUNDARY}"
+  req.content_type = "multipart/form-data, boundary=#{@BOUNDARY}"
   req.body =
-    "--#{BOUNDARY}\r\n" +
+    "--#{@BOUNDARY}\r\n" +
     "Content-Disposition: form-data; name=\"json_file\"; filename=\"json_file\"\r\n" +
     "Content-Type: application/json\r\n\r\n" +
-    JSON::generate(job) + "\r\n--#{BOUNDARY}--\r\n"
+    JSON::generate(job) + "\r\n--#{@BOUNDARY}--\r\n"
 
-  if !options[:dryrun] then
+  if !@options[:dryrun] then
     res = http.request(req)
     puts res.body if res
   end
+end
+
+end
+
+begin
+  lcoveralls = Lcoveralls.new
+  lcoveralls.parse_options
+  lcoveralls.run
 end
