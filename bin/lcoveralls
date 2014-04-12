@@ -10,15 +10,20 @@ require 'optparse'
 # @todo Set this via rake?
 VERSION = '0.0.1'
 
-options = {}
-
+options = { :verbosity => 1 }
 opts = OptionParser.new do |o|
   o.banner = "Usage: #{o.program_name} [options] [tracefile(s)]"
+  o.on(      '--dryrun',      'Do not actually submit to coverall.io' ) { options[:dryrun] = true }
   o.on('-h', '--help',        'Print usage text, then exit')     { puts o; exit }
   o.on('-r', '--root PATH',   'Set the path to the repo root')   { |path|  options[:root]  = path  }
   o.on('-s', '--service NAME','Set coveralls service name')      { |name|  options[:service] = name }
   o.on('-t', '--token TOKEN', 'Set coveralls repo token')        { |token| options[:token] = token }
-  o.on('-v', '--version',     'Print version number, then exit') { puts VERSION; exit }
+  o.on(      '--version',     'Print version number, then exit') { puts VERSION; exit }
+
+  o.on(      '--silent',      'Disable all standard output') { options[:verbosity] = 0 }
+  o.on('-q', '--quiet',       'Show less standard output')   { options[:verbosity] = options[:verbosity] - 1 }
+  o.on('-v', '--quiet',       'Show more standard output')   { options[:verbosity] = options[:verbosity] + 1 }
+  o.on(      '--trace',       'Show as much output as possible') { options[:verbosity] = 1000 }
 end
 
 begin
@@ -138,7 +143,11 @@ end
 begin
   # Find *.info tracefiles if none specified on the command line.
   Find.find('.') do |path|
-    ARGV << path if path =~ /.*\.info$/
+    puts "Looking for tracefiles: #{path}" if options[:verbosity] > 2
+    if path =~ /.*\.info$/ then
+      puts "Found tracefile: #{path}" if options[:verbosity] > 1
+      ARGV << path
+    end
   end unless ARGV.any?
 
   options[:root] = find_root(ARGV) unless options.include?(:root)
@@ -153,7 +162,9 @@ begin
   job[:git] = get_git_info(options[:root])
   job[:run_at] = Time.new
 
-#  puts JSON::pretty_generate job
+  if options[:verbosity] > 2 then
+    puts JSON::pretty_generate job
+  end
 
   uri = URI('https://coveralls.io/api/v1/jobs')
   http = Net::HTTP.new(uri.host, uri.port)
@@ -169,6 +180,8 @@ begin
     "Content-Type: application/json\r\n\r\n" +
     JSON::generate(job) + "\r\n--#{BOUNDARY}--\r\n"
 
-  res = http.request(req)
-  puts res.body
+  if !options[:dryrun] then
+    res = http.request(req)
+    puts res.body if res
+  end
 end
