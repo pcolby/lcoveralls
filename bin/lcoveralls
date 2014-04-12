@@ -2,10 +2,15 @@
 
 # Copyright 2014 Paul Colby
 
+# Include our lib path, if not already.
+lib_path = File.join(File.dirname(File.dirname(File.realpath(__FILE__))), 'lib')
+$LOAD_PATH.unshift(lib_path) unless $LOAD_PATH.include?(lib_path)
+
 require 'find'
 require 'json'
 require 'net/http'
 require 'optparse'
+require 'lcoveralls'
 
 # @todo Set this via rake?
 VERSION = '0.0.1'
