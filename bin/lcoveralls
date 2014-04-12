@@ -4,6 +4,7 @@
 
 require 'find'
 require 'json'
+require 'net/http'
 require 'optparse'
 
 # @todo Set this via rake?
@@ -14,7 +15,8 @@ options = {}
 opts = OptionParser.new do |o|
   o.banner = "Usage: #{o.program_name} [options] [tracefile(s)]"
   o.on('-h', '--help',        'Print usage text, then exit')     { puts o; exit }
-  o.on('-r', '--root PATH',   'Set the path to the repo root.')  { |path|  options[:root]  = path  }
+  o.on('-r', '--root PATH',   'Set the path to the repo root')   { |path|  options[:root]  = path  }
+  o.on('-s', '--service NAME','Set coveralls service name')      { |name|  options[:service] = name }
   o.on('-t', '--token TOKEN', 'Set coveralls repo token')        { |token| options[:token] = token }
   o.on('-v', '--version',     'Print version number, then exit') { puts VERSION; exit }
 end
@@ -128,15 +130,32 @@ begin
   abort 'Error: No root specified, and none could be detected.' unless options[:root]
 
   job = {}
-  job[:repo_token] = '@todo'
-  job[:service_name] = '@todo'   # 'travis'
-  job[:service_job_id] = '@todo' # TRAVIS_JOB_NUMBER
+  job[:repo_token] = options[:token]
+  job[:service_name] = 'lcoveralls' # @todo Use CLI and/or ENV.
+  #job[:service_job_id] = '1' # TRAVIS_JOB_NUMBER
 
   job[:source_files] = get_source_files(ARGV, options[:root])
   job[:git] = get_git_info(options[:root])
   job[:run_at] = Time.new
 
-  puts options
-  puts ARGV
-  puts JSON::pretty_generate job
+#  puts JSON::pretty_generate job
+
+  uri = URI('https://coveralls.io/api/v1/jobs')
+  http = Net::HTTP.new(uri.host, uri.port)
+  http.use_ssl = true
+  http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+
+  BOUNDARY = '--' + File.basename($0) + '-' + VERSION + '--'
+  req = Net::HTTP::Post.new(uri.path)
+  req.content_type = "multipart/form-data, boundary=#{BOUNDARY}"
+  req.body =
+    "--#{BOUNDARY}\r\n" +
+    "Content-Disposition: form-data; name=\"json_file\"; filename=\"json_file\"\r\n" +
+    "Content-Type: application/json\r\n\r\n" +
+    JSON::generate(job) + "\r\n\r\n--#{BOUNDARY}--\r\n"
+  puts req.content_type
+  puts req.body
+
+  res = http.request(req)
+  puts res.body
 end
