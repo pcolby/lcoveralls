@@ -153,8 +153,6 @@ begin
     "Content-Disposition: form-data; name=\"json_file\"; filename=\"json_file\"\r\n" +
     "Content-Type: application/json\r\n\r\n" +
     JSON::generate(job) + "\r\n\r\n--#{BOUNDARY}--\r\n"
-  puts req.content_type
-  puts req.body
 
   res = http.request(req)
   puts res.body
