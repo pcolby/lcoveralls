@@ -11,11 +11,46 @@ require 'json'
 require 'net/http'
 require 'optparse'
 require 'lcoveralls'
+require 'logger'
 
 # @todo Set this via rake?
 VERSION = '0.0.1'
 
 class Lcoveralls
+
+  def initialize
+    @start_time = Time.new
+    @color = $stdout.isatty
+    @log = Logger.new(STDERR)
+
+    @log.formatter = proc do |severity, datetime, progname, msg|
+puts 'x: ' + severity.inspect
+      case severity
+      when 'WARN'
+        color_code = '35' # Magenta
+      when 'ERROR'
+        color_code = '31' # red
+      when 'FATAL'
+        color_code = '31;1' # Red, bold
+      when 'UNKNOWN'
+        color_code = '31;1' # Red, bold
+      end# unless !@color
+
+    time = Time.new - @start_time
+
+      if color_code then
+        "\x1b[#{color_code}m#{time} #{severity}: #{msg}\x1b[0m\n"
+      else
+        "#{time} #{severity}: #{msg}\n"
+      end
+    end
+
+    @log.debug { 'Initialised' }
+    @log.info { 'info' }
+    @log.error { 'info' }
+    @log.fatal { 'info' }
+    @log.warn { 'info' }
+  end
 
 def parse_options
     @options = { :verbosity => 1 }
@@ -193,6 +228,8 @@ def run
     res = http.request(req)
     puts res.body if res
   end
+  
+  #@log.debug { 'done in ' + { Time.new - @start_time } + ' seconds' }
 end
 
 end
