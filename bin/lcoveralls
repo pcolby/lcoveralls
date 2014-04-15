@@ -139,7 +139,7 @@ def run
     exit!
   end
 
-  # @todo  travis-ci environment vars.
+  # Build the coveralls.io job request.
   job = {}
   job[:repo_token] = @options[:token] if @options.has_key? :token
   job[:service_name] = @options[:service] if @options.has_key? :service
@@ -150,6 +150,8 @@ def run
   job[:source_files] = get_source_files(ARGV, @options[:root])
   job[:git] = get_git_info(@options[:root])
   job[:run_at] = Time.new
+  request = Lcoveralls::CoverallsRequest.new(job)
+  @log.trace { request.body }
 
   # @todo  Explicit CLI option for this.
   #@log.debug { JSON::pretty_generate job }
@@ -160,11 +162,9 @@ def run
   http.use_ssl = true
   http.verify_mode = OpenSSL::SSL::VERIFY_PEER
 
-  req = Lcoveralls::CoverallsRequest.new(job)
-  @log.trace { req.body }
-
   if !@options[:dryrun] then
-    res = http.request(req)
+    @log.info {"Sending request" } # @todo include job_id (if any) and request size.
+    res = http.request(request)
     puts res.body if res
   end
 end
