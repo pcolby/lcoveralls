@@ -11,10 +11,7 @@ module Lcoveralls
       'Unknown' => '31;1'
     }
 
-    def initialize(color=:auto)
-      if color == :auto then
-        color = $stdout.isatty and ENV['TERM'] != 'dumb'
-      end
+    def initialize(color)
       @color = color
     end
 
