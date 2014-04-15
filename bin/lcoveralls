@@ -21,13 +21,14 @@ VERSION = '0.0.1'
 class Lcoverallsx
 
   def initialize
-    @log = Logger.new(STDERR)
-    @log.sev_threshold = Logger::INFO
-
     parser = Lcoveralls::OptionParser.new
     @options = parser.parse! ARGV
 
-    @log.formatter = Lcoveralls::ColorFormatter.new # @todo Apply --color option.
+    @log = Logger.new(STDERR)
+    @log.sev_threshold = Logger::INFO - @options[:verbosity]
+    @log.formatter = Lcoveralls::ColorFormatter.new @options[:color]
+    @log.debug { @options }
+
   end
 
 

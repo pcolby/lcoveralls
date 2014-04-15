@@ -5,7 +5,7 @@ module Lcoveralls
   class OptionParser
 
     def parse!(args)
-      options =  {}
+      options =  { :color => $stdout.isatty, :verbosity => 0 }
       parser = ::OptionParser.new do |o|
       o.banner = "Usage: #{o.program_name} [options] [tracefile(s)]"
       o.summary_width = 20
@@ -18,9 +18,10 @@ module Lcoveralls
       o.on('-t', '--token TOKEN', 'Set coveralls repo token')        { |token| options[:token] = token }
       o.separator ''
 
-      o.separator 'Logging options:'
-      #o.on('-q', '--quiet',   'Show less output') { log.sev_threshold = log.sev_threshold + 1 }
-      #o.on('-v', '--verbose', 'Show more output') { log.sev_threshold = log.sev_threshold - 1 }
+      o.separator 'Output options:'
+      o.on(      '--[no-]color', 'Colorize output') { |color| options[:color] = color }
+      o.on('-q', '--quiet',      'Show less output') { options[:verbosity] = options[:verbosity] - 1 }
+      o.on('-v', '--verbose',    'Show more output') { options[:verbosity] = options[:verbosity] + 1 }
       o.separator ''
 
       o.separator 'Miscellaneous options:'
@@ -30,17 +31,13 @@ module Lcoveralls
       end
 
       begin
-      #@log = Logger.new(STDERR)
-      #@log.sev_threshold = Logger::INFO
-      parser.parse! args
-      #@log.formatter = Lcoveralls::ColorFormatter.new # @todo Apply --color option.
+        parser.parse! args
+        options
       rescue ::OptionParser::InvalidOption => e
-      $stderr.puts opts
-      $stderr.puts e
-      exit 1
+        $stderr.puts parser
+        $stderr.puts e
+        exit!
       end
-
-      options
     end
 
   end
