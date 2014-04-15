@@ -5,7 +5,7 @@ module Lcoveralls
   class OptionParser
 
     def parse!(args)
-      options =  { :color => $stdout.isatty, :verbosity => 0 }
+      options =  { :color => $stderr.isatty, :severity => Logger::INFO }
       parser = ::OptionParser.new do |o|
       o.banner = "Usage: #{o.program_name} [options] [tracefile(s)]"
       o.summary_width = 20
@@ -20,8 +20,10 @@ module Lcoveralls
 
       o.separator 'Output options:'
       o.on(      '--[no-]color', 'Colorize output') { |color| options[:color] = color }
-      o.on('-q', '--quiet',      'Show less output') { options[:verbosity] = options[:verbosity] - 1 }
-      o.on('-v', '--verbose',    'Show more output') { options[:verbosity] = options[:verbosity] + 1 }
+      o.on('-d', '--debug',      'Enable debugging') { options[:severity] = Logger::DEBUG }
+      o.on(      '--trace',      'Maximum output')   { options[:severity] = Logger::TRACE }
+      o.on('-q', '--quiet',      'Show less output') { options[:severity] = options[:severity] + 1 }
+      o.on('-v', '--verbose',    'Show more output') { options[:severity] = options[:severity] - 1 }
       o.separator ''
 
       o.separator 'Miscellaneous options:'

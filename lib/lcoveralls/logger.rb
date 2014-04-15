@@ -2,8 +2,10 @@ require 'logger'
 
 class Logger
 
+  TRACE = DEBUG - 1
+
   def trace(progname = nil, &block)
-    add(-1, nil, progname, &block)
+    add(TRACE, nil, progname, &block)
   end
 
 end
