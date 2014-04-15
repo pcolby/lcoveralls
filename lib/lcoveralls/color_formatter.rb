@@ -11,15 +11,26 @@ module Lcoveralls
       'Unknown' => '31;1'
     }
 
+    def initialize(color=:auto)
+      if color == :auto then
+        color = $stdout.isatty and ENV['TERM'] != 'dumb'
+      end
+      @color = color
+    end
+
     def call(severity, datetime, progname, msg)
       severity.capitalize!
       if severity == 'Warn' then severity = 'Warning' end
 
-      color_code = COLOR_CODES[severity]
+      if %w[Warning Error Fatal Unknown].include?(severity) then
+        msg = "#{severity}: #{msg}"
+      end
+
+      color_code = COLOR_CODES[severity] if @color
       if color_code then
-        "\x1b[#{color_code}m#{severity}: #{msg}\x1b[0m\n"
+        "\x1b[#{color_code}m#{msg}\x1b[0m\n"
       else
-        "#{severity}: #{msg}\n"
+        "#{msg}\n"
       end
     end
 
