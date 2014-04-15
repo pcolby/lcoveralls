@@ -123,23 +123,6 @@ def get_git_info(root_dir)
   end if Dir.exist?(root_dir)
 end
 
-# Note, 0-73 is valid for MIME, but only 0-61 is valid for HTTP headers.
-def boundary_chr(index)
-  case index
-  when 0..9
-    index.to_s
-  when 10..35
-    ('a'.ord + index - 10).chr
-  when 36..61
-    ('A'.ord + index - 36).chr
-  when 62..73
-    "'()+_,-./:=?"[index - 62]
-  else
-    @log.error "Invalid boundary index #{index}"
-    exit!
-  end
-end
-
 def run
   # Find *.info tracefiles if none specified on the command line.
   Find.find('.') do |path|
@@ -175,26 +158,16 @@ def run
   http.use_ssl = true
   http.verify_mode = OpenSSL::SSL::VERIFY_PEER
 
-  @BOUNDARY = (1...70).map { boundary_chr(rand(62)) }.join
-  req = Net::HTTP::Post.new(uri.path)
-  req.content_type = "multipart/form-data, boundary=#{@BOUNDARY}"
-  req.body =
-    "--#{@BOUNDARY}\r\n" +
-    "Content-Disposition: form-data; name=\"json_file\"; filename=\"json_file\"\r\n" +
-    "Content-Type: application/json\r\n\r\n" +
-    JSON::generate(job) + "\r\n--#{@BOUNDARY}--\r\n"
+  req = Lcoveralls::CoverallsRequest.new(job)
+  @log.trace { req.body }
 
   if !@options[:dryrun] then
     res = http.request(req)
     puts res.body if res
   end
-  
-  #@log.debug { 'done in ' + { Time.new - @start_time } + ' seconds' }
 end
 
 end
 
-begin
-  lcoveralls = Lcoverallsx.new
-  lcoveralls.run
-end
+lcoveralls = Lcoverallsx.new
+lcoveralls.run
