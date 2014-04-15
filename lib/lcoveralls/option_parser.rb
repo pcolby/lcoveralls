@@ -15,6 +15,7 @@
 #
 
 require 'logger'
+require 'optparse'
 
 module Lcoveralls
 

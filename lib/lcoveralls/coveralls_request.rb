@@ -15,6 +15,7 @@
 #
 
 require 'json'
+require 'net/http'
 
 module Lcoveralls
 
