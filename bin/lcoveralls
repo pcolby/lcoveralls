@@ -27,8 +27,8 @@ class Lcoverallsx
 
     # Setup a logger instance.
     @log = Logger.new(STDERR)
-    @log.sev_threshold = @options[:severity]
     @log.formatter = Lcoveralls::ColorFormatter.new @options[:color]
+    @log.sev_threshold = @options[:severity]
     @log.debug { "Options: #{@options}" }
   end
 
