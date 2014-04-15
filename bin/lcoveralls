@@ -21,7 +21,7 @@ VERSION = '0.0.1'
 class Lcoverallsx
 
 def parse_options
-    @options = { :verbosity => 1 }
+  @options = {}
   opts = OptionParser.new do |o|
     o.banner = "Usage: #{o.program_name} [options] [tracefile(s)]"
     o.summary_width = 20
@@ -35,10 +35,8 @@ def parse_options
     o.separator ''
 
     o.separator 'Logging options:'
-    o.on(      '--silent',      'Disable all standard output') { @options[:verbosity] = 0 }
-    o.on('-q', '--quiet',       'Show less standard output')   { @options[:verbosity] = @options[:verbosity] - 1 }
-    o.on('-v', '--quiet',       'Show more standard output')   { @options[:verbosity] = @options[:verbosity] + 1 }
-    o.on(      '--trace',       'Show as much output as possible') { @options[:verbosity] = 1000 }
+    o.on('-q', '--quiet',   'Show less output') { @log.sev_threshold = @log.sev_threshold + 1 }
+    o.on('-v', '--verbose', 'Show more output') { @log.sev_threshold = @log.sev_threshold - 1 }
     o.separator ''
 
     o.separator 'Miscellaneous options:'
@@ -48,8 +46,9 @@ def parse_options
   end
 
   begin
-    opts.parse!
     @log = Logger.new(STDERR)
+    @log.sev_threshold = Logger::INFO
+    opts.parse!
     @log.formatter = Lcoveralls::ColorFormatter.new # @todo Apply --color option.
   rescue OptionParser::InvalidOption => e
     $stderr.puts opts
@@ -168,9 +167,9 @@ end
 def run
   # Find *.info tracefiles if none specified on the command line.
   Find.find('.') do |path|
-    puts "Looking for tracefiles: #{path}" if @options[:verbosity] > 2
+    @log.debug { "Looking for tracefiles: #{path}" }
     if path =~ /.*\.info$/ then
-      puts "Found tracefile: #{path}" if @options[:verbosity] > 1
+      @log.info { "Found tracefile: #{path}" }
       ARGV << path
     end
   end unless ARGV.any?
@@ -192,9 +191,7 @@ def run
   job[:run_at] = Time.new
 
   # @todo  Explicit CLI option for this.
-  if @options[:verbosity] > 2 then
-    puts JSON::pretty_generate job
-  end
+  @log.debug { JSON::pretty_generate job }
 
   # @todo All this HTTPS stuff can go into a separate class?
   uri = URI('https://coveralls.io/api/v1/jobs')
