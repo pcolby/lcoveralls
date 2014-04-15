@@ -2,6 +2,8 @@
 
 # Copyright 2014 Paul Colby
 
+# @todo FOSS license goes here.
+
 # Include our lib path, if not already.
 lib_path = File.join(File.dirname(File.dirname(File.realpath(__FILE__))), 'lib')
 $LOAD_PATH.unshift(lib_path) unless $LOAD_PATH.include?(lib_path)
@@ -12,45 +14,43 @@ require 'net/http'
 require 'optparse'
 require 'lcoveralls'
 
-require 'lcoveralls/color_formatter'
-
 # @todo Set this via rake?
 VERSION = '0.0.1'
 
+# @todo Better name for this class.  Maybe within a module?
 class Lcoverallsx
-
-  def initialize
-    @start_time = Time.new
-    @color = $stdout.isatty
-    @log = Logger.new(STDERR)
-    @log.formatter = Lcoveralls::ColorFormatter.new
-
-    @log.debug { 'Initialised' }
-    @log.info { 'info' }
-    @log.error { 'info' }
-    @log.fatal { 'info' }
-    @log.warn { 'info' }
-  end
 
 def parse_options
     @options = { :verbosity => 1 }
   opts = OptionParser.new do |o|
     o.banner = "Usage: #{o.program_name} [options] [tracefile(s)]"
-    o.on(      '--dryrun',      'Do not actually submit to coverall.io' ) { @options[:dryrun] = true }
-    o.on('-h', '--help',        'Print usage text, then exit')     { puts o; exit }
+    o.summary_width = 20
+    o.separator ''
+
+    o.separator 'Code / coveralls.io options:'
+    o.on(      '--dryrun',      'Do not actually submit to coveralls.io' ) { @options[:dryrun] = true }
     o.on('-r', '--root PATH',   'Set the path to the repo root')   { |path|  @options[:root]  = path  }
     o.on('-s', '--service NAME','Set coveralls service name')      { |name|  @options[:service] = name }
     o.on('-t', '--token TOKEN', 'Set coveralls repo token')        { |token| @options[:token] = token }
-    o.on(      '--version',     'Print version number, then exit') { puts VERSION; exit }
+    o.separator ''
 
+    o.separator 'Logging options:'
     o.on(      '--silent',      'Disable all standard output') { @options[:verbosity] = 0 }
     o.on('-q', '--quiet',       'Show less standard output')   { @options[:verbosity] = @options[:verbosity] - 1 }
     o.on('-v', '--quiet',       'Show more standard output')   { @options[:verbosity] = @options[:verbosity] + 1 }
     o.on(      '--trace',       'Show as much output as possible') { @options[:verbosity] = 1000 }
+    o.separator ''
+
+    o.separator 'Miscellaneous options:'
+    o.on('-h', '--help',        'Print usage text, then exit')     { puts o; exit }
+    o.on(      '--version',     'Print version number, then exit') { puts VERSION; exit }
+    o.separator ''
   end
 
   begin
     opts.parse!
+    @log = Logger.new(STDERR)
+    @log.formatter = Lcoveralls::ColorFormatter.new # @todo Apply --color option.
   rescue OptionParser::InvalidOption => e
     $stderr.puts opts
     $stderr.puts e
@@ -160,7 +160,8 @@ def boundary_chr(index)
   when 62..73
     "'()+_,-./:=?"[index - 62]
   else
-    abort "Error: Invalid boundary index #{index}"
+    @log.error "Invalid boundary index #{index}"
+    exit!
   end
 end
 
@@ -175,8 +176,12 @@ def run
   end unless ARGV.any?
 
   @options[:root] = find_root(ARGV) unless @options.include?(:root)
-  abort 'Error: No root specified, and none could be detected.' unless @options[:root]
+  if !@options[:root] then
+    @log.error 'No root specified, and none could be detected.'
+    exit!
+  end
 
+  # @todo  travis-ci environment vars.
   job = {}
   job[:repo_token] = @options[:token]
   job[:service_name] = 'lcoveralls' # @todo Use CLI and/or ENV.
@@ -186,10 +191,12 @@ def run
   job[:git] = get_git_info(@options[:root])
   job[:run_at] = Time.new
 
+  # @todo  Explicit CLI option for this.
   if @options[:verbosity] > 2 then
     puts JSON::pretty_generate job
   end
 
+  # @todo All this HTTPS stuff can go into a separate class?
   uri = URI('https://coveralls.io/api/v1/jobs')
   http = Net::HTTP.new(uri.host, uri.port)
   http.use_ssl = true
