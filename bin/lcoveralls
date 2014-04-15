@@ -141,10 +141,12 @@ def run
 
   # @todo  travis-ci environment vars.
   job = {}
-  job[:repo_token] = @options[:token]
-  job[:service_name] = 'lcoveralls' # @todo Use CLI and/or ENV.
-  #job[:service_job_id] = '1' # TRAVIS_JOB_NUMBER
-
+  job[:repo_token] = @options[:token] if @options.has_key? :token
+  job[:service_name] = @options[:service] if @options.has_key? :service
+  job[:service_job_id] = @options[:job_id] if @options.has_key? :job_id
+  if !job.has_key?(:token) and !job.has_key?(:service_job_id) then
+    @log.warn { 'No service job id detected; consider using --token' }
+  end
   job[:source_files] = get_source_files(ARGV, @options[:root])
   job[:git] = get_git_info(@options[:root])
   job[:run_at] = Time.new

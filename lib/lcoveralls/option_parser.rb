@@ -5,7 +5,17 @@ module Lcoveralls
   class OptionParser
 
     def parse!(args)
-      options =  { :color => $stderr.isatty, :severity => Logger::INFO }
+      options =  {
+        :color    => $stderr.isatty,
+        :service  => File.basename($0),
+        :severity => Logger::INFO
+      }
+
+      if ENV.has_key? 'TRAVIS_JOB_NUMBER' then
+        options[:service] = 'travis-ci'
+        options[:job_id] = ENV['TRAVIS_JOB_NUMBER']
+      end
+
       parser = ::OptionParser.new do |o|
       o.banner = "Usage: #{o.program_name} [options] [tracefile(s)]"
       o.summary_width = 20
