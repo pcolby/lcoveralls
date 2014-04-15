@@ -163,7 +163,7 @@ def run
   http.verify_mode = OpenSSL::SSL::VERIFY_PEER
 
   if !@options[:dryrun] then
-    @log.info {"Sending request" } # @todo include job_id (if any) and request size.
+    @log.debug { "Sending #{request.body.size} bytes to coveralls.io" }
     res = http.request(request)
     puts res.body if res
   end
