@@ -197,7 +197,7 @@ module Lcoveralls
         @options[:export].write(JSON::pretty_generate job);
       end
 
-      # @todo All this HTTPS stuff can go into a separate class?
+      # Send (if not in dryrun mode) the Coveralls API request.
       uri = URI('https://coveralls.io/api/v1/jobs')
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
