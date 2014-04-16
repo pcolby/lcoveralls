@@ -7,5 +7,5 @@ Gem::Specification.new do |spec|
   spec.license     = 'Apache-2.0'
   spec.name        = 'lcoveralls'
   spec.summary     = 'Submit gcov/lcov results to the Coveralls API'
-  spec.version     = '0.1.0.pre'
+  spec.version     = '0.1.0.pre.1'
 end

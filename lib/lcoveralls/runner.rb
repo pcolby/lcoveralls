@@ -17,9 +17,6 @@
 
 require 'find'
 
-# @todo Set this via rake?
-VERSION = '0.0.1'
-
 module Lcoveralls
   class Runner
 

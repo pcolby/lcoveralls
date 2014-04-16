@@ -14,9 +14,6 @@
 # limitations under the License.
 #
 
-require 'lcoveralls/color_formatter'
-require 'lcoveralls/coveralls_request'
-require 'lcoveralls/logger'
-require 'lcoveralls/option_parser'
-require 'lcoveralls/runner'
-require 'lcoveralls/version'
+module Lcoveralls
+  VERSION = [ 0, 1, 0, 'pre', 1 ]
+end

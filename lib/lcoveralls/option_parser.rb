@@ -65,7 +65,7 @@ module Lcoveralls
       o.separator 'Miscellaneous options:'
       o.on(      '--[no-]git PATH', 'Path to the git program') { |path| options[:git] = path }
       o.on('-h', '--help',    'Print usage text, then exit')     { puts o; exit }
-      o.on(      '--version', 'Print version number, then exit') { puts VERSION; exit }
+      o.on(      '--version', 'Print version number, then exit') { puts VERSION.join('.'); exit }
       o.separator ''
       end
 
