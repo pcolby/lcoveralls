@@ -44,7 +44,16 @@ lcoveralls
 Be sure to run `lcoveralls --help` for options.
 
 ### Travis CI
-@todo
+
+```
+install:
+  - sudo apt-get install lcov rubygems
+
+...
+
+after_success:
+  - lcoveralls
+```
 
 ## License
 Apache License 2.0
