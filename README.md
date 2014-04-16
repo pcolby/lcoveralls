@@ -5,7 +5,9 @@ Lcoveralls is a simple (Ruby) script for reporting code coverage results from
 Instead of invoking `gcov` directly, as some alternative projects do (quite successfully),
 Loveralls depends on the tracefiles that LCOV generates from g++ / gcov's output.
 
-<diagram to go here>
+![Lcoveralls Data Flow](
+https://raw.githubusercontent.com/pcolby/lcoveralls/master/doc/diagrams/data-flow.png
+"Data flow from source code, through gcc, lcov, and lcoveralls to coveralls.io")
 
 The benefit of using LCOV's tracefiles is two-fold:
 
