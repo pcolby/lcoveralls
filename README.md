@@ -23,7 +23,7 @@ not an issue for me, but I guess it could be for someone.
 ## Installation
 
 ```
-gem install lcoveralls --pre
+gem install lcoveralls
 ```
 
 ## Usage
@@ -54,7 +54,7 @@ For example:
 ```
 install:
   - sudo apt-get install lcov rubygems
-  - gem install lcoveralls -pre
+  - gem install lcoveralls
 
 ...
 
