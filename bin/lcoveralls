@@ -48,7 +48,7 @@ def find_root(info_files)
     File.open(file).each do |line|
       line.match(/^SF:(.*)$/) do |match|
         Dir.chdir(File.dirname(match[1])) do
-          root_dir = `git rev-parse --show-toplevel`.rstrip
+          root_dir = `"#{@options[:git]}" rev-parse --show-toplevel`.rstrip
           root_dirs[root_dir] = root_dirs[root_dir] + 1 unless root_dir.empty?
         end if Dir.exist?(File.dirname(match[1]))
       end
@@ -86,10 +86,12 @@ def get_source_files(info_files, root_dir)
     lines_found = nil
     lines_hit = nil
     File.open(file).each do |line|
+      @log.debug "#{file}: #{line.rstrip}"
+
       # SF:<absolute path to the source file>
       line.match('^SF:' + Regexp.quote(root_dir) + '/(.*)$') do |match|
         @log.warn 'Found source filename without preceding end_of_record' if in_record
-        @log.trace "Found source filename: #{match[1]}"
+        @log.debug "Found source filename: #{match[1]}"
         source_pathname = match[1]
         if !sources.has_key?(source_pathname) then
           source = File.read(match[1])
@@ -141,20 +143,20 @@ end
 
 def get_git_info(root_dir)
   Dir.chdir(root_dir) do
-    info = {}
+    info = {
+      :head => {
+        :id             => `"#{@options[:git]}" show --format='%H' --no-patch`.rstrip,
+        :author_name    => `"#{@options[:git]}" show --format='%an' --no-patch`.rstrip,
+        :author_email   => `"#{@options[:git]}" show --format='%ae' --no-patch`.rstrip,
+        :commiter_name  => `"#{@options[:git]}" show --format='%cn' --no-patch`.rstrip,
+        :commiter_email => `"#{@options[:git]}" show --format='%ce' --no-patch`.rstrip,
+        :message        => `"#{@options[:git]}" show --format='%B' --no-patch`.rstrip,
+      },
+      :branch  => `"#{@options[:git]}" rev-parse --abbrev-ref HEAD`.rstrip,
+      :remotes => []
+    }
 
-    info[:head] = {}
-    info[:head][:id] = `git show --format='%H' --no-patch`.rstrip
-    info[:head][:author_name] = `git show --format='%an' --no-patch`.rstrip
-    info[:head][:author_email] = `git show --format='%ae' --no-patch`.rstrip
-    info[:head][:commiter_name] = `git show --format='%cn' --no-patch`.rstrip
-    info[:head][:commiter_email] = `git show --format='%ce' --no-patch`.rstrip
-    info[:head][:message] = `git show --format='%B' --no-patch`.rstrip
-
-    info[:branch] = `git rev-parse --abbrev-ref HEAD`.rstrip
-
-    info[:remotes] = []
-    `git remote --verbose`.each_line do |line|
+    `"#{@options[:git]}" remote --verbose`.each_line do |line|
       line.match(/^(?<name>\S+)\s+(?<url>\S+)(\s+\((fetch|push)\))?/) do |match|
         info[:remotes] << Hash[match.names.zip(match.captures)]
       end
@@ -178,7 +180,7 @@ def run
 
   @options[:root] = find_root(ARGV) unless @options.include?(:root)
   if !@options[:root] then
-    @log.error 'No root specified, and none could be detected.'
+    @log.error 'Root not specified, nor detected; consider using --root'
     exit!
   end
 
@@ -188,10 +190,10 @@ def run
   job[:service_name] = @options[:service] if @options.has_key? :service
   job[:service_job_id] = @options[:job_id] if @options.has_key? :job_id
   if !job.has_key?(:token) and !job.has_key?(:service_job_id) then
-    @log.warn { 'No service job id detected; consider using --token' }
+    @log.warn 'No service job id detected; consider using --token'
   end
   job[:source_files] = get_source_files(ARGV, @options[:root])
-  job[:git] = get_git_info(@options[:root])
+  job[:git] = get_git_info(@options[:root]) unless !@options[:git]
   job[:run_at] = Time.new
   request = Lcoveralls::CoverallsRequest.new(job)
   @log.trace { request.body }

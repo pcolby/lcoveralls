@@ -24,6 +24,7 @@ module Lcoveralls
     def parse!(args)
       options =  {
         :color    => $stderr.isatty,
+        :git      => 'git',
         :service  => File.basename($0),
         :severity => Logger::INFO
       }
@@ -39,23 +40,26 @@ module Lcoveralls
       o.separator ''
 
       o.separator 'Code / coveralls.io options:'
-      o.on(      '--dryrun',      'Do not actually submit to coveralls.io' ) { options[:dryrun] = true }
-      o.on('-r', '--root PATH',   'Set the path to the repo root')   { |path|  options[:root]  = path  }
-      o.on('-s', '--service NAME','Set coveralls service name')      { |name|  options[:service] = name }
-      o.on('-t', '--token TOKEN', 'Set coveralls repo token')        { |token| options[:token] = token }
+      o.on(      '--dryrun',      'Do not submit to coveralls.io' ) { options[:dryrun] = true }
+      o.on('-r', '--root PATH',   'Set the path to the repo root') { |path|  options[:root]  = File.realpath(path) }
+      o.on('-s', '--service NAME','Set coveralls service name')    { |name|  options[:service] = name }
+      o.on('-t', '--token TOKEN', 'Set coveralls repo token')      { |token| options[:token] = token }
+#      o.on(      '--export-json FILE'
       o.separator ''
 
-      o.separator 'Output options:'
-      o.on(      '--[no-]color', 'Colorize output') { |color| options[:color] = color }
+      o.separator 'Stderr output options:'
+      o.on(      '--[no-]color', 'Colorize output')  { |color| options[:color] = color }
       o.on('-d', '--debug',      'Enable debugging') { options[:severity] = Logger::DEBUG }
       o.on(      '--trace',      'Maximum output')   { options[:severity] = Logger::TRACE }
       o.on('-q', '--quiet',      'Show less output') { options[:severity] = options[:severity] + 1 }
       o.on('-v', '--verbose',    'Show more output') { options[:severity] = options[:severity] - 1 }
       o.separator ''
 
+      o.on(      '--[no-]git PATH', 'Path to the git program') { |path| options[:git] = path }
+
       o.separator 'Miscellaneous options:'
-      o.on('-h', '--help',        'Print usage text, then exit')     { puts o; exit }
-      o.on(      '--version',     'Print version number, then exit') { puts VERSION; exit }
+      o.on('-h', '--help',    'Print usage text, then exit')     { puts o; exit }
+      o.on(      '--version', 'Print version number, then exit') { puts VERSION; exit }
       o.separator ''
       end
 
