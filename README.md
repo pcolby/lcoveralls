@@ -9,7 +9,7 @@ Loveralls depends on the tracefiles that LCOV generates from g++ / gcov's output
 https://raw.githubusercontent.com/pcolby/lcoveralls/master/doc/diagrams/data-flow.png
 "Data flow from source code, through gcc, lcov, and lcoveralls to coveralls.io")
 
-The benefit of using LCOV's tracefiles is two-fold:
+The benefit of using LCOV's tracefiles (aka *.info files) is two-fold:
 
 1. LCOV's inclusion / exclusion logic is well proven, and time tested - no need
    to reinvent that wheel; and
@@ -28,7 +28,7 @@ not an issue for me, but I guess it could be for someone.
 
 1. Build your project with gcov support.
 2. Execute your test(s).
-3. Execute `lcov` to generate tracefiles (ake *.info files).
+3. Execute `lcov` to generate tracefiles (aka *.info files).
 4. Execute `lcoveralls` to submit the coverage report(s) to Coveralls.
 
 For example:
