@@ -3,7 +3,7 @@
 Lcoveralls is a simple (Ruby) script for reporting code coverage results from
 [LCOV](http://ltp.sourceforge.net/coverage/lcov.php) to [Coveralls](https://coveralls.io/).
 Instead of invoking `gcov` directly, as some alternative projects do (quite successfully),
-Loveralls depends on the tracefiles that LCOV generates from g++ / gcov's output.
+Lcoveralls depends on the tracefiles that LCOV generates from g++ / gcov's output.
 
 ![Lcoveralls Data Flow](
 https://raw.githubusercontent.com/pcolby/lcoveralls/master/doc/diagrams/data-flow.png
@@ -45,8 +45,9 @@ Be sure to run `lcoveralls --help` for options.
 
 ### Travis CI
 
-To use locveralls within Travis CI, simple install the gem, and then once all of
-your tests have passed (including any necessary lcov invocations), run lcoveralls.
+To use Lcoveralls within Travis CI, simply install the gem, and then once all of
+your tests have passed (including any necessary `lcov` invocations), invoke 
+lcoveralls.
 
 For example:
 
@@ -61,7 +62,7 @@ after_success:
   - lcoveralls
 ```
 
-Note, if you are using Travis Pro, you should let lcoveralls know via the
+Note, if you are using Travis Pro, you should let Lcoveralls know via the
 `--service` option, for example:
 
 ```
