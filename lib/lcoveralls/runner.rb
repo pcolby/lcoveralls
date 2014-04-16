@@ -52,7 +52,7 @@ module Lcoveralls
         root_dirs.shift[0]
       else
         root_dir = root_dirs.max_by { |key, value| value }[0]
-        @log.warn "Found multiple possible repo roots. Settled on #{root_dir}"
+        @log.warn "Found multiple possible repo roots; settled on: #{root_dir}"
         root_dir
       end
     end
