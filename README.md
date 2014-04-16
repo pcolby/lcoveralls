@@ -1,3 +1,4 @@
 # Lcoveralls
 
-Report Gcov / LCOV (ie C, C++, Go, etc) code coverage to coveralls.io
+Locveralls is a simple (Ruby) script for reporting code coverage results from
+[LCOV](http://ltp.sourceforge.net/coverage/lcov.php) to [Coveralls](https://coveralls.io/).
