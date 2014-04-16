@@ -198,8 +198,10 @@ def run
   request = Lcoveralls::CoverallsRequest.new(job)
   @log.trace { request.body }
 
-  # @todo  Explicit CLI option for this.
-  #@log.debug { JSON::pretty_generate job }
+  # If asked to, export the Coveralls API job request JSON document.
+  if @options.has_key? :export then
+    @options[:export].write(JSON::pretty_generate job);
+  end
 
   # @todo All this HTTPS stuff can go into a separate class?
   uri = URI('https://coveralls.io/api/v1/jobs')
