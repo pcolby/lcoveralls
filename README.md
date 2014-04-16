@@ -22,7 +22,9 @@ not an issue for me, but I guess it could be for someone.
 
 ## Installation
 
-@todo
+```
+gem install lcoveralls --pre
+```
 
 ## Usage
 
