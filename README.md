@@ -7,8 +7,6 @@ depends on the tracfiles that LCOV generates from g++ / gcov'e output.
 
 <diagram to go here>
 
-12345678901234567890123456789012345678901234567890123456789012345678901234567890
-
 The benefit to using LCOV's tracefiles is two-fold:
 1. LCOV's inclusion / exclusion logic is well proven, and time tested - no need
    to reinvent that wheel; and
