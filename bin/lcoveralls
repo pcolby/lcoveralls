@@ -25,8 +25,8 @@ require 'lcoveralls'
 # @todo Set this via rake?
 VERSION = '0.0.1'
 
-# @todo Better name for this class.  Maybe within a module?
-class Lcoverallsx
+module Lcoveralls
+  class Runner
 
   def initialize
     # Parse the command line options.
@@ -216,7 +216,7 @@ def run
   end
 end
 
+  end
 end
 
-lcoveralls = Lcoverallsx.new
-lcoveralls.run
+Lcoveralls::Runner.new().run
