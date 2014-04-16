@@ -61,8 +61,13 @@ after_success:
   - lcoveralls
 ```
 
-Note, if you are using Travis CI Pro, you should also use the `--service` option,
-like `lcoverals --service travis-pro`.
+Note, if you are using Travis Pro, you should let lcoveralls know via the
+`--service` option, for example:
+
+```
+after_success:
+  - lcoverals --service travis-pro
+```
 
 ## License
 Apache License 2.0
