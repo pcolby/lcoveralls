@@ -61,20 +61,35 @@ def find_root(info_files)
     root_dirs.shift[0]
   else
     root_dir = root_dirs.max_by { |key, value| value }[0]
-    warn "Warning: Found multiple possible repo roots. Settled on #{root_dir}"
+    @log.warn "Found multiple possible repo roots. Settled on #{root_dir}"
     root_dir
   end
 end
 
+def get_percentage(lines_hit, lines_found, bold=false)
+  perc = lines_hit.to_f / lines_found.to_f * 100.0
+  color = case when perc >= 90; 32 when perc >= 75; 33 else 31 end
+  if bold then color = "1;#{color}" end
+  perc = perc.finite? ? format('%5.1f%', perc) : ' ' * 6
+  perc = "\x1b[#{color}m#{perc}\x1b[0m" if @options[:color] and color
+  perc
+end
+
 def get_source_files(info_files, root_dir)
   sources = {}
+  total_lines_found = 0
+  total_lines_hit = 0
   info_files.each do |file|
+    @log.debug "Processing tracefile: #{file}"
     source_pathname = nil
     in_record = false
+    lines_found = nil
+    lines_hit = nil
     File.open(file).each do |line|
       # SF:<absolute path to the source file>
       line.match('^SF:' + Regexp.quote(root_dir) + '/(.*)$') do |match|
-        warn 'Warning: Found source filename without preceding end_of_record' if in_record
+        @log.warn 'Found source filename without preceding end_of_record' if in_record
+        @log.trace "Found source filename: #{match[1]}"
         source_pathname = match[1]
         if !sources.has_key?(source_pathname) then
           source = File.read(match[1])
@@ -84,21 +99,41 @@ def get_source_files(info_files, root_dir)
             :coverage => Array.new(source.lines.count)
           }
         end
+        in_record = true
       end
 
       # DA:<line number>,<execution count>[,<checksum>]
-      line.match(/DA:(?<line>\d+),(?<count>\d+)(,(?<checksum>.*))?$/) do |match|
+      line.match(/^DA:(?<line>\d+),(?<count>\d+)(,(?<checksum>.*))?$/) do |match|
         line_index = match[:line].to_i - 1
         if !sources[source_pathname][:coverage][line_index] then
           sources[source_pathname][:coverage][line_index] = 0
         end
         sources[source_pathname][:coverage][line_index] = 
           sources[source_pathname][:coverage][line_index] + match[:count].to_i;
-      end
+      end if in_record
+
+      # LF:<lines found> or LH:<lines hit>
+      line.match(/^LF:(?<count>\d+)$/) { |match| lines_found = match[:count] }
+      line.match(/^LH:(?<count>\d+)$/) { |match| lines_hit   = match[:count] }
 
       # end_of_record
-      in_record = false if line == "end_of_record\n"
+      if line == "end_of_record\n" and in_record then
+        @log.info begin
+          perc = get_percentage(lines_hit, lines_found)
+          "[#{perc}] #{source_pathname} (#{lines_hit}/#{lines_found})"
+        end
+        total_lines_found = total_lines_found + lines_found.to_i
+        total_lines_hit = total_lines_hit + lines_hit.to_i
+        in_record = false
+        lines_found = nil
+        lines_hit = nil
+      end
     end
+  end
+
+  @log.info begin
+    perc = get_percentage(total_lines_hit, total_lines_found, true)
+    "[#{perc}] Total (#{total_lines_hit}/#{total_lines_found})"
   end
 
   sources.values
