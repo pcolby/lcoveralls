@@ -4,7 +4,7 @@ Gem::Specification.new do |spec|
   spec.description = 'Lcoveralls is a simple script for reporting code coverage results from LCOV to Coveralls.'
   spec.email       = 'ruby@colby.id.au'
   spec.executables = [ 'lcoveralls' ]
-  spec.files       = Dir['lib/*']
+  spec.files       = Dir['lib/*.rb'] + Dir['lib/lcoveralls/*.rb']
   spec.homepage    = 'https://github.com/pcolby/lcoveralls'
   spec.license     = 'Apache-2.0'
   spec.name        = 'lcoveralls'
