@@ -45,15 +45,24 @@ Be sure to run `lcoveralls --help` for options.
 
 ### Travis CI
 
+To use locveralls within Travis CI, simple install the gem, and then once all of
+your tests have passed (including any necessary lcov invocations), run lcoveralls.
+
+For example:
+
 ```
 install:
   - sudo apt-get install lcov rubygems
+  - gem install lcoveralls -pre
 
 ...
 
 after_success:
   - lcoveralls
 ```
+
+Note, if you are using Travis CI Pro, you should also use the `--service` option,
+like `lcoverals --service travis-pro`.
 
 ## License
 Apache License 2.0
