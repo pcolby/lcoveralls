@@ -31,7 +31,7 @@ module Lcoveralls
 
       if ENV.has_key? 'TRAVIS_JOB_NUMBER' then
         options[:service] = 'travis-ci'
-        options[:job_id] = ENV['TRAVIS_JOB_NUMBER']
+        options[:job_id] = ENV['TRAVIS_JOB_ID']
       end
 
       parser = ::OptionParser.new do |o|
