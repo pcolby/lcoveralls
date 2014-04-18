@@ -1,6 +1,6 @@
 ## Lcoveralls Changelog
 
-### 0.2.0 (_unreleased_)
+### 0.2.0 (2014-04-18)
 Features:
 - submission retry command line options ([#1](../../issues/1))
 
