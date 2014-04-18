@@ -41,8 +41,8 @@ lcov --capture ... && lcov --remove ...
 lcoveralls [-t <coveralls repo token>]
 ```
 
-The token is not necessary when using Travis CI. Be sure to run `lcoveralls --help`
-for more options.
+The token is not necessary when using Travis CI. Run `lcoveralls --help` for
+more options.
 
 ### Travis CI
 
