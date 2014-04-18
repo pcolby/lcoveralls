@@ -1,5 +1,6 @@
 # Lcoveralls
-[![Gem Version](https://badge.fury.io/rb/lcoveralls.png)](http://badge.fury.io/rb/lcoveralls)
+[![Gem Version](https://badge.fury.io/rb/lcoveralls.svg)](http://badge.fury.io/rb/lcoveralls)
+[![Dependency Status](https://gemnasium.com/pcolby/lcoveralls.svg)](https://gemnasium.com/pcolby/lcoveralls)
 
 Lcoveralls is a simple (Ruby) script for reporting code coverage results from
 [LCOV](http://ltp.sourceforge.net/coverage/lcov.php) to [Coveralls](https://coveralls.io/).
