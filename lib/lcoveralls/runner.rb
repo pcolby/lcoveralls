@@ -159,6 +159,21 @@ module Lcoveralls
       end if Dir.exist?(root_dir)
     end
 
+    def should_retry
+      return false unless @options[:retry_count] > 0
+      @options[:retry_count] = @options[:retry_count] - 1;
+
+      if @options[:retry_interval] > 0 then
+        @log.info { "Sleeping for #{@options[:retry_interval]} seconds before retrying" }
+        begin
+          sleep @options[:retry_interval]
+        rescue Interrupt
+          return false
+        end
+      end
+      true
+    end
+
     def run
       # Find *.info tracefiles if none specified on the command line.
       Find.find('.') do |path|
@@ -197,13 +212,28 @@ module Lcoveralls
       # Send (if not in dryrun mode) the Coveralls API request.
       uri = URI('https://coveralls.io/api/v1/jobs')
       http = Net::HTTP.new(uri.host, uri.port)
+      http.open_timeout = @options[:timeout] if @options.has_key? :timeout
+      http.read_timeout = @options[:timeout] if @options.has_key? :timeout
+      http.ssl_timeout = @options[:timeout] if @options.has_key? :timeout
       http.use_ssl = true
       http.verify_mode = OpenSSL::SSL::VERIFY_PEER
 
       if !@options[:dryrun] then
-        @log.debug { "Sending #{request.body.size} bytes to coveralls.io" }
-        res = http.request(request)
-        puts res.body if res
+        begin
+          @log.debug { "Sending #{request.body.size} bytes to coveralls.io" }
+          response = http.request(request)
+          @log.debug { "HTTP response status: #{response.code} #{response.message}" }
+          raise response.code unless response.is_a? Net::HTTPSuccess
+          puts response.body
+        rescue RuntimeError => e
+          raise unless response
+          @log.error { "Received non-OK response: #{response.code} #{response.message}" }
+          puts response.body
+          retry if should_retry unless response.is_a? Net::HTTPClientError
+        rescue SocketError => error
+          @log.error { error }
+          retry if should_retry
+        end
       end
     end
 

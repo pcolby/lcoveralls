@@ -23,10 +23,12 @@ module Lcoveralls
 
     def parse!(args)
       options =  {
-        :color    => $stderr.isatty,
-        :git      => 'git',
-        :service  => File.basename($0),
-        :severity => Logger::INFO
+        :color          => $stderr.isatty,
+        :git            => 'git',
+        :retry_count    => 0,
+        :retry_interval => 10.0,
+        :service        => File.basename($0),
+        :severity       => Logger::INFO
       }
 
       if ENV.has_key? 'TRAVIS_JOB_NUMBER' then
@@ -52,6 +54,19 @@ module Lcoveralls
       o.on('-r', '--root PATH',   'Set the path to the repo root') { |path|  options[:root]  = File.realpath(path) }
       o.on('-s', '--service NAME','Set coveralls service name')    { |name|  options[:service] = name }
       o.on('-t', '--token TOKEN', 'Set coveralls repo token')      { |token| options[:token] = token }
+      o.separator ''
+
+      o.separator 'Network options:'
+      o.on('--timeout DURATION',
+           'Timout, in seconds, for network open and read operations') do |duration|
+        options[:timeout] = duration.to_f
+      end
+      o.on('--retry-count COUNT', 'Number of times to retry sending to coveralls.io') do |count|
+        options[:retry_count] = count.to_i
+      end
+      o.on('--retry-interval DURATION', 'Time to wait between retries') do |count|
+        options[:retry_interval] = count.to_f;
+      end
       o.separator ''
 
       o.separator 'Stderr output options:'
