@@ -71,5 +71,12 @@ after_success:
   - lcoverals --service travis-pro
 ```
 
+Some real-word Travis CI examples:
+
+Project | .travis.yml
+--------|------------
+[libqtaws](https://github.com/pcolby/libqtaws) | [.travis.yml](https://github.com/pcolby/libqtaws/blob/master/.travis.yml)
+[pcp-pmda-cpp](https://github.com/pcolby/pcp-pmda-cpp) | [.travis.yml](https://github.com/pcolby/pcp-pmda-cpp/blob/master/.travis.yml)
+
 ## License
 Apache License 2.0
