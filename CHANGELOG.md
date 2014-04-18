@@ -2,7 +2,7 @@
 
 ### 0.2.0 (_unreleased_)
 Features:
-- coveralls.io retry support ([#1](../../issues/1))
+- submission retry command line options ([#1](../../issues/1))
 
 Bug fixes:
 - non-zero exit code on submission failures ([#2](../../issues/2))
