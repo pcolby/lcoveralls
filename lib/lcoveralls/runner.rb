@@ -230,9 +230,11 @@ module Lcoveralls
           @log.error { "Received non-OK response: #{response.code} #{response.message}" }
           puts response.body
           retry if should_retry unless response.is_a? Net::HTTPClientError
+          exit!
         rescue SocketError => error
           @log.error { error }
           retry if should_retry
+          exit!
         end
       end
     end
