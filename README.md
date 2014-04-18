@@ -1,6 +1,8 @@
 # Lcoveralls
-[![Gem Version](https://badge.fury.io/rb/lcoveralls.svg)](http://badge.fury.io/rb/lcoveralls)
-[![Dependency Status](https://gemnasium.com/pcolby/lcoveralls.svg)](https://gemnasium.com/pcolby/lcoveralls)
+[![Dependency Status](http://img.shields.io/gemnasium/pcolby/lcoveralls.svg)](https://gemnasium.com/pcolby/lcoveralls)
+[![Gem Version](http://img.shields.io/gem/v/lcoveralls.svg)](https://rubygems.org/gems/lcoveralls)
+[![Github Release](http://img.shields.io/github/release/pcolby/lcoveralls.svg)](https://github.com/pcolby/lcoveralls/releases/latest)
+[![Apache License](http://img.shields.io/badge/license-APACHE2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 
 Lcoveralls is a simple (Ruby) script for reporting code coverage results from
 [LCOV](http://ltp.sourceforge.net/coverage/lcov.php) to [Coveralls](https://coveralls.io/).
