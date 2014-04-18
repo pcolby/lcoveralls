@@ -38,7 +38,7 @@ For example:
 g++ -fprofile-arcs -ftest-coverage -O0 -o test <source files>
 ./test
 lcov --capture ... && lcov --remove ...
-lcoveralls [-t <coveralls repo token>]
+lcoveralls [--token <coveralls repo token>]
 ```
 
 The token is not necessary when using Travis CI. Run `lcoveralls --help` for
