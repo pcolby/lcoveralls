@@ -16,12 +16,21 @@
 
 require 'logger'
 
+# Adds {TRACE} severity logging to Ruby's Logger class.
 class Logger
 
+  # {TRACE} severity is one less than +::Logger::DEBUG+.
   TRACE = DEBUG - 1
 
+  # Log a {TRACE} message.
+  #
+  # See +::Logger::info+ for more information.
   def trace(progname = nil, &block)
     add(TRACE, nil, progname, &block)
   end
+
+  # Returns +true+ if the current severity level allows for the printing of
+  # {TRACE} messages.
+  def trace?; @level <= TRACE; end
 
 end
