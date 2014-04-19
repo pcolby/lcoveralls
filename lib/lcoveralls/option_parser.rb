@@ -19,8 +19,14 @@ require 'optparse'
 
 module Lcoveralls
 
+  # Parses CLI options for the Lcoveralls application.
   class OptionParser
 
+    # Destructively parse the command line arguments.
+    #
+    # @params args [Array] Arguments to parse.
+    #
+    # @return [Hash] parsed options.
     def parse!(args)
       options =  {
         :color          => $stderr.isatty,
