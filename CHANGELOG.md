@@ -1,7 +1,8 @@
 ## Lcoveralls Changelog
 
 ### 0.2.1 (_unreleased_)
-- _nothing yet..._
+Features:
+- code documentation ([#4](../../issues/4))
 
 ### 0.2.0 (2014-04-18)
 Features:
