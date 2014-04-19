@@ -18,8 +18,11 @@
 require 'find'
 
 module Lcoveralls
+
+  # Runs the Lcoveralls application.
   class Runner
 
+    # Initializes a new Locveralls::Runner instance.
     def initialize
       # Parse the command line options.
       parser = Lcoveralls::OptionParser.new
@@ -32,6 +35,21 @@ module Lcoveralls
       @log.debug { "Options: #{@options}" }
     end
 
+    # Attempts to auto-detect the git repository root.
+    #
+    # This method looks throuhgh all source files covered by the supplied
+    # tracefiles, and for each, check if they are part of a git repository.
+    # The method then returns git repository's root directory.
+    #
+    # If more than one git repository are found to be covered by the tracefiles
+    # then a warning will be logged, and the root of the repository with the
+    # largest number of source files covered will be returned.
+    #
+    # If no git repository roots could be found, then +nil+ is returned.
+    #
+    # @param info_files [Array] A list of LCOV tracefiles (aka *.info files).
+    #
+    # @return [String, nil] A git repository root, if found, otherwise +nil+.
     def find_root(info_files)
       # Try source file(s) covered by the lcov tracefile(s).
       root_dirs = Hash.new(0)
@@ -57,6 +75,21 @@ module Lcoveralls
       end
     end
 
+    # Format a percentage string.
+    #
+    # This method formats the number of lines hit, as a percentage of the total
+    # number of lines, including prepended spaces, and color codes where
+    # appropriate.
+    #
+    # If the percentage cannot be calculated (for example, either parameter is
+    # +nil+, NaN, +/- ininity, etc), then this function will return a 'blank'
+    # string - one with enough spaces to match the width of other valid
+    # percentage strings returned by this function.
+    #
+    # @param lines_hit [Integer, nil] Number of lines hit by unit tests.
+    # @param lines_found [Integer, nil] Number of executable lines.
+    #
+    # @return [String] Percentage of lines overered.
     def get_percentage(lines_hit, lines_found, bold=false)
       perc = lines_hit.to_f / lines_found.to_f * 100.0
       color = case when perc >= 90; 32 when perc >= 75; 33 else 31 end
@@ -66,6 +99,16 @@ module Lcoveralls
       perc
     end
 
+    # Builds a hash of source files matching the Coveralls API.
+    #
+    # This method will build a Hash containing all source files covered by the
+    # supplies LCOV tracefiles, that reside within the specified repository
+    # root directory.
+    #
+    # @param info_file [Array] LCOV tracefiles containing source files to load.
+    # @param root_dir [String] Repository root directory.
+    #
+    # @return [Hash] Source files in Coveralls API structure.
     def get_source_files(info_files, root_dir)
       sources = {}
       total_lines_found = 0
@@ -132,6 +175,11 @@ module Lcoveralls
       sources.values
     end
 
+    # Get git repository information in the Coveralla API structure.
+    #
+    # @param root_dir Git repository root directory.
+    #
+    # @return [Hash] Git repository information.
     def get_git_info(root_dir)
       Dir.chdir(root_dir) do
         info = {
@@ -159,7 +207,19 @@ module Lcoveralls
       end if Dir.exist?(root_dir)
     end
 
-    def should_retry
+    # Should we retry a failed Coveralls API request?
+    #
+    # This method is called by {run} on internal and server errors to check if
+    # the API request should be retried. Specifically, this function checks the
+    # :retry_count option, and if greater than zero decrements it before
+    # returning +true+.
+    #
+    # Additionally, if retrying is appropriate, and the :retry_interval option
+    # is greater than zero, this function will also sleep for that interval.
+    #
+    # @return [Boolean] +true+ if the caller should retry the API request, or
+    #         +false+ if no more retries should be attempted.
+    def should_retry?
       return false unless @options[:retry_count] > 0
       @options[:retry_count] = @options[:retry_count] - 1;
 
@@ -174,6 +234,10 @@ module Lcoveralls
       true
     end
 
+    # Runs the Lcoveralls application.
+    #
+    # This method does the real work of building up the Coveralls API request
+    # according to the parsed options, and submitting the request to Coveralls.
     def run
       # Find *.info tracefiles if none specified on the command line.
       Find.find('.') do |path|
@@ -229,11 +293,11 @@ module Lcoveralls
           raise unless response
           @log.error { "Received non-OK response: #{response.code} #{response.message}" }
           puts response.body
-          retry if should_retry unless response.is_a? Net::HTTPClientError
+          retry if should_retry? unless response.is_a? Net::HTTPClientError
           exit!
         rescue SocketError => error
           @log.error { error }
-          retry if should_retry
+          retry if should_retry?
           exit!
         end
       end
