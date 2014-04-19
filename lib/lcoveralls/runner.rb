@@ -209,7 +209,7 @@ module Lcoveralls
 
     # Should we retry a failed Coveralls API request?
     #
-    # This method is called by {run} on internal and server errors to check if
+    # This method is called by {#run} on internal and server errors to check if
     # the API request should be retried. Specifically, this function checks the
     # :retry_count option, and if greater than zero decrements it before
     # returning +true+.
