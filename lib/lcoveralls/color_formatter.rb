@@ -18,8 +18,10 @@ require 'logger'
 
 module Lcoveralls
 
+  # Adds some color to loggers.
   class ColorFormatter < Logger::Formatter
 
+    # Maps log severities to color codes.
     COLOR_CODES = {
       'Warning' => '35',
       'Error'   => '31',
@@ -27,10 +29,19 @@ module Lcoveralls
       'Unknown' => '31;1'
     }
 
+    # Initializes a new ColorFormatter.
+    #
+    # @param color [Boolean] Whether to enable color output.
     def initialize(color)
       @color = color
     end
 
+    # Invoked by Logger objects to format a log message.
+    #
+    # @param severity [String] Severity of the message to format.
+    # @param datetime [Time] Timestamp for the message to format.
+    # @param progname [String] Name of the program that generated the message.
+    # @param msg [String] The message to format.
     def call(severity, datetime, progname, msg)
       severity.capitalize!
       if severity == 'Warn' then severity = 'Warning' end
