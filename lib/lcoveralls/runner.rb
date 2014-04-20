@@ -289,7 +289,7 @@ module Lcoveralls
           @log.debug { "HTTP response status: #{response.code} #{response.message}" }
           raise response.code unless response.is_a? Net::HTTPSuccess
           puts response.body
-        rescue RuntimeError => e
+        rescue RuntimeError
           raise unless response
           @log.error { "Received non-OK response: #{response.code} #{response.message}" }
           puts response.body
