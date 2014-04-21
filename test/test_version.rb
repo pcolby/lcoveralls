@@ -18,4 +18,13 @@ require 'test_helper'
 
 require_relative '../lib/lcoveralls/version'
 
-# @todo  Add tests here.
+class TestVersion < Test::Unit::TestCase
+
+  def test_version
+    assert(Lcoveralls::VERSION.size >= 3)
+    assert_instance_of(Fixnum, Lcoveralls::VERSION[0]);
+    assert_instance_of(Fixnum, Lcoveralls::VERSION[1]);
+    assert_instance_of(Fixnum, Lcoveralls::VERSION[2]);
+  end
+
+end
