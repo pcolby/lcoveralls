@@ -14,12 +14,17 @@
 # limitations under the License.
 #
 
+require 'coveralls'
+Coveralls.wear!
+
 require 'simplecov'
+SimpleCov.coverage_dir 'doc/coverage'
+SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+  SimpleCov::Formatter::HTMLFormatter,
+  Coveralls::SimpleCov::Formatter
+]
 SimpleCov.start do
   add_filter 'test'
 end
-
-require 'coveralls'
-Coveralls.wear!
 
 require 'test/unit'
