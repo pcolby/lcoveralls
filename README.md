@@ -1,4 +1,5 @@
 # Lcoveralls
+[![Build Status](http://img.shields.io/travis/pcolby/lcoveralls.svg)](https://travis-ci.org/pcolby/lcoveralls)
 [![Dependency Status](http://img.shields.io/gemnasium/pcolby/lcoveralls.svg)](https://gemnasium.com/pcolby/lcoveralls)
 [![Gem Version](http://img.shields.io/gem/v/lcoveralls.svg)](https://rubygems.org/gems/lcoveralls)
 [![Github Release](http://img.shields.io/github/release/pcolby/lcoveralls.svg)](https://github.com/pcolby/lcoveralls/releases/latest)
