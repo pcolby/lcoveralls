@@ -14,9 +14,9 @@
 # limitations under the License.
 #
 
-require_relative '../lib/lcoveralls/color_formatter'
-
 require 'test_helper'
+
+require_relative '../lib/lcoveralls/color_formatter'
 
 class TestColorFormatter < Test::Unit::TestCase
 
