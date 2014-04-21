@@ -16,7 +16,7 @@
 
 require_relative '../lib/lcoveralls/color_formatter'
 
-require 'test/unit'
+require 'test_helper'
 
 class TestColorFormatter < Test::Unit::TestCase
 
