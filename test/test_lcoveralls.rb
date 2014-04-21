@@ -18,4 +18,26 @@ require 'test_helper'
 
 require_relative '../lib/lcoveralls/'
 
-# @todo Check that the appropriate classes are now defined.
+class TestVersion < Test::Unit::TestCase
+
+  def test_requires
+    assert defined?(Lcoveralls::ColorFormatter),
+      'Lcoveralls::ColorFormatter class not defined'
+
+    assert defined?(Lcoveralls::CoverallsRequest),
+      'Lcoveralls::CoverallsRequest class not defined'
+
+    logger = Logger.new StringIO.new
+    assert_respond_to(logger, 'trace')
+
+    assert defined?(Lcoveralls::OptionParser),
+      'Lcoveralls::OptionParser class not defined'
+
+    assert defined?(Lcoveralls::Runner),
+      'Lcoveralls::Runner class not defined'
+
+    assert defined?(Lcoveralls::VERSION),
+      'Lcoveralls::VERSION class not defined'
+  end
+
+end
