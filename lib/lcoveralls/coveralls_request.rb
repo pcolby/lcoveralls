@@ -29,7 +29,7 @@ module Lcoveralls
     # @param path Optional HTTP request path.
     def initialize(job, path='/api/v1/jobs')
       super path
-      @boundary = (1...70).map { self.class.boundary_chr(rand(62)) }.join
+      @boundary = (1..70).map { self.class.boundary_chr(rand(62)) }.join
       set_content_type "multipart/form-data, boundary=#{@boundary}"
       @body =
         "--#{@boundary}\r\n" +
@@ -44,7 +44,7 @@ module Lcoveralls
     #        between 0 and 73. *Note*, although indices between 0 and 73 are
     #        valid according to the MIME standard, only indices between 0 and
     #        61 are valid for HTTP headers. If index is outside the range 0 to
-    #        73, this method will abort.
+    #        73, this method will raise a RuntimeError.
     #
     # @return [String] a valid MIME boundary character.
     def self.boundary_chr(index)
@@ -58,7 +58,7 @@ module Lcoveralls
       when 62..73
         "'()+_,-./:=?"[index - 62]
       else
-        abort "Invalid boundary index #{index}"
+        raise "Invalid boundary index #{index}"
       end
     end
 
