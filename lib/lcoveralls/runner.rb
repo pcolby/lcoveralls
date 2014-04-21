@@ -1,4 +1,3 @@
-#!/usr/bin/ruby -w
 #
 # Copyright 2014 Paul Colby
 #
