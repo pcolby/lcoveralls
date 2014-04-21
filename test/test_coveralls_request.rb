@@ -14,12 +14,8 @@
 # limitations under the License.
 #
 
-require 'simplecov'
-SimpleCov.start do
-  add_filter 'test'
-end
+require 'test_helper'
 
-require 'coveralls'
-Coveralls.wear!
+require_relative '../lib/lcoveralls/coveralls_request'
 
-require 'test/unit'
+# @todo  Add tests here.
