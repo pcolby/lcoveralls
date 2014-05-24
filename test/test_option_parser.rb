@@ -20,7 +20,7 @@ require_relative '../lib/lcoveralls/option_parser'
 
 class TestOptionParser < Test::Unit::TestCase
 
-  def startup
+  def setup
     @jobNumber = ENV['TRAVIS_JOB_NUMBER'] if ENV.has_key? 'TRAVIS_JOB_NUMBER'
     @jobId     = ENV['TRAVIS_JOB_ID']     if ENV.has_key? 'TRAVIS_JOB_ID'
   end
@@ -35,7 +35,7 @@ class TestOptionParser < Test::Unit::TestCase
       ENV['TRAVIS_JOB_ID'] = @jobId
     else
       ENV.delete('TRAVIS_JOB_ID')
-    end    
+    end
   end
 
   def test_parse_defaults_with_travis
