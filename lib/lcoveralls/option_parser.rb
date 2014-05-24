@@ -96,7 +96,7 @@ module Lcoveralls
       rescue ::OptionParser::InvalidOption => e
         $stderr.puts parser
         $stderr.puts e
-        exit!
+        exit(false)
       end
     end
 
