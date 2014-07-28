@@ -15,6 +15,7 @@
 #
 
 require 'find'
+require 'openssl'
 
 module Lcoveralls
 
