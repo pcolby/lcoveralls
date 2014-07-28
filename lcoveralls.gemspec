@@ -9,5 +9,5 @@ Gem::Specification.new do |spec|
   spec.license     = 'Apache-2.0'
   spec.name        = 'lcoveralls'
   spec.summary     = 'Report Gcov / LCOV (ie C, C++, Go, etc) code coverage to coveralls.io'
-  spec.version     = '0.2.1.pre.1'
+  spec.version     = '0.2.1'
 end

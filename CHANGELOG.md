@@ -1,6 +1,6 @@
 ## Lcoveralls Changelog
 
-### 0.2.1 (_unreleased_)
+### 0.2.1 (2014-07-29)
 Features:
 - code documentation ([#4](../../issues/4))
 - unit tests ([#3](../../issues/3))
