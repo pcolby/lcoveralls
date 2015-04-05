@@ -102,7 +102,7 @@ module Lcoveralls
     # Builds a hash of source files matching the Coveralls API.
     #
     # This method will build a Hash containing all source files covered by the
-    # supplies LCOV tracefiles, that reside within the specified repository
+    # supplied LCOV tracefiles, that reside within the specified repository
     # root directory.
     #
     # @param info_file [Array] LCOV tracefiles containing source files to load.
@@ -175,7 +175,7 @@ module Lcoveralls
       sources.values
     end
 
-    # Get git repository information in the Coveralla API structure.
+    # Get git repository information in the Coveralls API structure.
     #
     # @param root_dir Git repository root directory.
     #
