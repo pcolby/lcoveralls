@@ -105,7 +105,7 @@ module Lcoveralls
     # supplied LCOV tracefiles, that reside within the specified repository
     # root directory.
     #
-    # @param info_file [Array] LCOV tracefiles containing source files to load.
+    # @param info_files [Array] LCOV tracefiles containing source files to load.
     # @param root_dir [String] Repository root directory.
     #
     # @return [Hash] Source files in Coveralls API structure.
