@@ -43,7 +43,7 @@ module Lcoveralls
     # @param progname [String] Name of the program that generated the message.
     # @param msg [String] The message to format.
     def call(severity, datetime, progname, msg)
-      severity.capitalize!
+      severity = severity.capitalize
       if severity == 'Warn' then severity = 'Warning' end
 
       if %w[Warning Error Fatal Unknown].include?(severity) then
