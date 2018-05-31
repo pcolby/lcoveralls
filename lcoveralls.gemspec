@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.author      = 'Paul Colby'
-  spec.date        = '2010-04-28'
+  spec.date        = '2018-05-31'
   spec.description = 'Lcoveralls is a simple script for reporting code coverage results from LCOV to Coveralls.'
   spec.email       = 'ruby@colby.id.au'
   spec.executables = [ 'lcoveralls' ]
