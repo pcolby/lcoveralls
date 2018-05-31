@@ -1,10 +1,12 @@
 ## Lcoveralls Changelog
 
-### 0.2.2 (2018-05-31)
+### 0.2.3 (2018-05-31)
 Bug fixes:
 - destructive operation on frozen string ([#6](../../pull/6))
 
 Special thanks to @masatake for contributing to this release.
+
+### 0.2.2 (yanked)
 
 ### 0.2.1 (2014-07-29)
 Features:
