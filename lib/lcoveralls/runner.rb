@@ -94,7 +94,7 @@ module Lcoveralls
       perc = lines_hit.to_f / lines_found.to_f * 100.0
       color = case when perc >= 90; 32 when perc >= 75; 33 else 31 end
       if bold then color = "1;#{color}" end
-      perc = perc.finite? ? format('%5.1f%', perc) : ' ' * 6
+      perc = perc.finite? ? format('%5.1f%%', perc) : ' ' * 6
       perc = "\x1b[#{color}m#{perc}\x1b[0m" if @options[:color] and color
       perc
     end
