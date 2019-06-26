@@ -1,5 +1,11 @@
 ## Lcoveralls Changelog
 
+### 0.2.4 (2019-06-26)
+Bug fixes:
+- wrong use of `%` in `format()` ([#8](../../pull/8))
+
+Special thanks to @masatake for contributing to this release.
+
 ### 0.2.3 (2018-05-31)
 Bug fixes:
 - destructive operation on frozen string ([#6](../../pull/6))
